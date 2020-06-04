@@ -52,7 +52,7 @@ Step 3
 	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
 
 ---------------------------------
-Proof 5: given x even, y = even, z = x + y, prove z even
+Proof 6: given x even, y = even, z = x + y, prove z even
 Step 1
 	x = [EVEN, UNKNOWN_VALUE]
 	y = [EVEN, UNKNOWN_VALUE]

@@ -2,7 +2,7 @@
 
 The idea is to use trees (s-expressions) to do simple proofs.
 
-Currently, it uses four axioms about natural numbers and there are 6 example proofs underneath the code demonstrating functionality. Four of the proofs are trivial and two are nontrivial. 
+Currently, it uses 4 axioms about natural numbers and there are 6 example proofs underneath the code demonstrating functionality. 4 of the proofs are trivial and 2 are nontrivial. 
 
 Included is an example file demonstrating the output of running the program.
 

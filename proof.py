@@ -404,6 +404,8 @@ def trivial_proofs():
 	prove(hypothesis, conclusion)
 	print("---------------------------------")
 
+	# prove transitivity
+
 def non_trivial_proofs():
 	print("NONTRIVIAL PROOFS:")
 	print("Proof 5: given x = 2k + 2l for some k and l, prove x even")
@@ -418,7 +420,7 @@ def non_trivial_proofs():
 	prove(hypothesis, conclusion)
 	print("---------------------------------")
 	
-	print("Proof 5: given x even, y = even, z = x + y, prove z even")
+	print("Proof 6: given x even, y = even, z = x + y, prove z even")
 	hypothesis = Node([
 		Natural('x', EVEN, UNKNOWN_VALUE),
 		Natural('y', EVEN, UNKNOWN_VALUE),
