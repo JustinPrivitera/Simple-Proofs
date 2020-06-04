@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# split this into a few files
+
 import copy
 
 UNKNOWN_PARITY = -1
@@ -25,20 +27,18 @@ class Natural:
 		self.parity = parity
 		self.value = value
 
-	def equals(self, natural):
+	def equals(self, natural, neighbors, nat_neighbors):
 		if self.parity == natural.parity:
 			if type(self.value) != type(natural.value):
 				return False
-			if type(self.value) == int:
-				if self.value == natural.value:
-					return True
-				return False
-			if type(self.value) == str:
-				if self.value == natural.value:
-					return True
-				return False
+			elif type(self.value) == int:
+				return self.value == natural.value
+			# if type(self.value) == str:
+			# 	if self.value == natural.value:
+			# 		return True
+			# 	return False
 			else:
-				return self.value.equals(natural.value)
+				return self.value.equals(natural.value, neighbors, nat_neighbors)
 		return False
 
 	def to_string(self):
@@ -63,9 +63,9 @@ class Binop:
 		self.l = l
 		self.r = r
 
-	def equals(self, binop):
+	def equals(self, binop, neighbors, nat_neighbors):
 		if self.op == binop.op:
-			return operand_equals(self.l, binop.l) and operand_equals(self.r, binop.r)
+			return operand_equals(self.l, binop.l, neighbors, nat_neighbors) and operand_equals(self.r, binop.r, neighbors, nat_neighbors)
 		return False
 
 	def to_string(self):
@@ -90,16 +90,20 @@ class Binop:
 		retstr += ")"
 		return retstr
 
-def operand_equals(op1, op2):
+def lookup(name, numbers):
+	for i in range(0, len(numbers)):
+		if numbers[i].name == name:
+			return numbers[i]
+	print("error lookup failed")
+	return numbers[0]
+
+def operand_equals(op1, op2, op1_neighbors, op2_neighbors):
 	if type(op1) != type(op2):
 		return False
 	if type(op1) == int:	
-		if op1 == op2:
-			return True
-		return False
-	if type(op1) == str: # same variable name
-		if op1 == op2:
-			return True
+		return op1 == op2
+	if type(op1) == str: # variable names
+		return lookup(op1, op1_neighbors).equals(lookup(op2, op2_neighbors), op1_neighbors, op2_neighbors)
 	return op1.equals(op2) # this covers both the natural and binop cases
 
 class Node:
@@ -112,18 +116,25 @@ class Node:
 		if len(self.numbers) != len(node.numbers):
 			return False
 		for i in range(0, len(self.numbers)):
-			if not self.numbers[i].equals(node.numbers[i]):
+			if not self.numbers[i].equals(node.numbers[i], self.numbers, node.numbers):
 				return False
 		return True
 		# this doesn't work I think because nodes could be the same but ordered differently
 
 	def to_string(self):
-		retstr = "node\n"
+		# retstr = "node\n"
+		retstr = "\n"
 		for i in range(0, len(self.numbers)):
 			retstr += "\t" + self.numbers[i].to_string() + "\n"
 		for i in range(0, len(self.nodes)):
 			retstr += self.nodes[i].to_string()
 		return retstr
+
+	def get_var_names(self):
+		names = []
+		for i in range(0, len(self.numbers)):
+			names.append(self.numbers[i].name)
+		return names
 
 def node_redundancy(nodes, node):
 	# make sure that new nodes generated are not equivalent to existing nodes
@@ -138,6 +149,13 @@ def node_redundancy(nodes, node):
 		i += 1
 	return nodes
 
+def get_var_name(node):
+	num = ord('a')
+	names = node.get_var_names()
+	while chr(num) in names:
+		num += 1
+	return chr(num)
+
 # if parity of x is even --> x = 2k for some k
 def even_forward(node):
 	nodes = []
@@ -146,11 +164,12 @@ def even_forward(node):
 		if node.numbers[i].parity == EVEN:
 			if node.numbers[i].value == UNKNOWN_VALUE:
 				new_node = copy.deepcopy(node)
-				k = Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)
+				var_name = get_var_name(node)
+				k = Natural(var_name, UNKNOWN_PARITY, UNKNOWN_VALUE)
 				new_node.numbers.append(k)
-				new_node.numbers[i].value = Binop('*', 2, 'k')
+				new_node.numbers[i].value = Binop('*', 2, var_name)
 				nodes.append(new_node)
-			# else: I am going to so regret not having an else
+			# else: I am going to regret not having an else
 	return node_redundancy(nodes, node)
 
 # if x = 2k for some k --> parity of x is even
@@ -168,6 +187,17 @@ def even_reverse(node):
 					new_node.numbers[i].parity = EVEN
 					nodes.append(new_node)
 	return node_redundancy(nodes, node)
+
+# if a = bc + bd --> a = b(c + d)
+# if a = (+ (* b c) (* b d)) --> a = (* b (c + d))
+def factor_forward(node):
+	pass
+
+def factor_reverse(node):
+	pass
+
+# substitution
+# new definition
 
 axioms = [even_forward, even_reverse]
 
@@ -203,13 +233,16 @@ def prove(hypothesis, conclusion):
 	# print(graph.to_string())
 	# print(len(graph.nodes))
 	path = DFS(graph, conclusion, [])
+	if not path:
+		print("conclusion not found in graph")
+		return
 	path = process_path(path)
 
 	print(path[0].to_string())
 
 print("given x even, prove x = 2k for some k")
 hypothesis = Node([Natural('x', EVEN, UNKNOWN_VALUE)], [])
-conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'a')), Natural('a', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
 prove(hypothesis, conclusion)
 print("---------------------------------")
 
