@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # split this into a few files
+# write a hypothesis and conclusion parser
 
 import copy
 
@@ -104,7 +105,7 @@ def operand_equals(op1, op2, op1_neighbors, op2_neighbors):
 		return op1 == op2
 	if type(op1) == str: # variable names
 		return lookup(op1, op1_neighbors).equals(lookup(op2, op2_neighbors), op1_neighbors, op2_neighbors)
-	return op1.equals(op2) # this covers both the natural and binop cases
+	return op1.equals(op2, op1_neighbors, op2_neighbors) # this covers both the natural and binop cases
 
 class Node:
 	def __init__(self, numbers, nodes):
@@ -164,6 +165,7 @@ def even_forward(node):
 		if node.numbers[i].parity == EVEN:
 			if node.numbers[i].value == UNKNOWN_VALUE:
 				new_node = copy.deepcopy(node)
+				new_node.nodes = [node]
 				var_name = get_var_name(node)
 				k = Natural(var_name, UNKNOWN_PARITY, UNKNOWN_VALUE)
 				new_node.numbers.append(k)
@@ -184,22 +186,59 @@ def even_reverse(node):
 					if node.numbers[i].parity == ODD:
 						print("parity overwrite error")
 					new_node = copy.deepcopy(node)
+					new_node.nodes = [node]
 					new_node.numbers[i].parity = EVEN
 					nodes.append(new_node)
 	return node_redundancy(nodes, node)
 
+def new_factored_node(node, factor, left, right, i):
+	new_node = copy.deepcopy(node)
+	new_node.nodes = [node]
+	new_node.numbers[i].value = Binop('*', factor, Binop('+', left, right))
+	return new_node
+
+def try_factorization_combos(binop1, binop2, node, i):
+	# coerce them to be able to call equals by encasing them in naturals
+	# left and left
+	if Natural('x', UNKNOWN_PARITY, binop1.l).equals(Natural('x', UNKNOWN_PARITY, binop2.l), node.numbers, node.numbers):
+		return new_factored_node(node, binop1.l, binop1.r, binop2.r, i)
+	# left and right
+	elif Natural('x', UNKNOWN_PARITY, binop1.l).equals(Natural('x', UNKNOWN_PARITY, binop2.r), node.numbers, node.numbers):
+		return new_factored_node(node, binop1.l, binop1.r, binop2.l, i)
+	# right and left
+	elif Natural('x', UNKNOWN_PARITY, binop1.r).equals(Natural('x', UNKNOWN_PARITY, binop2.l), node.numbers, node.numbers):
+		return new_factored_node(node, binop1.r, binop1.l, binop2.r, i)
+	# right and right
+	elif Natural('x', UNKNOWN_PARITY, binop1.r).equals(Natural('x', UNKNOWN_PARITY, binop2.r), node.numbers, node.numbers):
+		return new_factored_node(node, binop1.r, binop1.l, binop2.l, i)
+	else:
+		return "FAILURE"
+
 # if a = bc + bd --> a = b(c + d)
-# if a = (+ (* b c) (* b d)) --> a = (* b (c + d))
+# if a = (+ (* b c) (* b d)) --> a = (* b (+ c d))
 def factor_forward(node):
-	pass
+	nodes = []
+	# must go through numbers and apply axiom if applicable and add to nodes list to be returned
+	for i in range(0, len(node.numbers)):
+		target = node.numbers[i].value
+		if type(target) == Binop:
+			if target.op == '+':
+				if type(target.l) == Binop and type(target.r) == Binop:
+					l_target = target.l
+					r_target = target.r
+					if l_target.op == '*' and r_target.op == '*':
+						result = try_factorization_combos(l_target, r_target, node, i)
+						if result != "FAILURE":
+							nodes.append(result)
+	return node_redundancy(nodes, node)
 
 def factor_reverse(node):
 	pass
 
 # substitution
-# new definition
+# new definition/reduction of complicated formulas
 
-axioms = [even_forward, even_reverse]
+axioms = [even_forward, even_reverse, factor_forward]
 
 def populate_graph(node):
 	nodes = []
@@ -240,14 +279,28 @@ def prove(hypothesis, conclusion):
 
 	print(path[0].to_string())
 
-print("given x even, prove x = 2k for some k")
+print("Proof 1: given x even, prove x = 2k for some k")
 hypothesis = Node([Natural('x', EVEN, UNKNOWN_VALUE)], [])
 conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'a')), Natural('a', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
 prove(hypothesis, conclusion)
 print("---------------------------------")
 
-print("given x = 2k for some k, prove x even")
+print("Proof 2: given x = 2k for some k, prove x even")
 hypothesis = Node([Natural('x', UNKNOWN_PARITY, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
 conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
 prove(hypothesis, conclusion)
 print("---------------------------------")
+
+print("Proof 3: given x = 2k + 2l for some k and l, prove x = 2(k + l)")
+hypothesis = Node([
+	Natural('x', UNKNOWN_PARITY, Binop('+', Binop('*', 2, 'k'), Binop('*', 2, 'l'))), 
+	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+conclusion = Node([
+	Natural('x', UNKNOWN_PARITY, Binop('*', 2, Binop('+', 'k', 'l'))),
+	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+prove(hypothesis, conclusion)
+print("---------------------------------")
+
+# print("Proof *: given x = 2k, y = 2l, z = x + y for some k and l, prove z even")
