@@ -279,28 +279,60 @@ def prove(hypothesis, conclusion):
 
 	print(path[0].to_string())
 
-print("Proof 1: given x even, prove x = 2k for some k")
-hypothesis = Node([Natural('x', EVEN, UNKNOWN_VALUE)], [])
-conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'a')), Natural('a', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
-prove(hypothesis, conclusion)
-print("---------------------------------")
+def trivial_proofs():
+	print("TRIVIAL PROOFS:")
+	print("Proof 1: given x even, prove x = 2k for some k")
+	hypothesis = Node([Natural('x', EVEN, UNKNOWN_VALUE)], [])
+	conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'a')), Natural('a', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	prove(hypothesis, conclusion)
+	print("---------------------------------")
 
-print("Proof 2: given x = 2k for some k, prove x even")
-hypothesis = Node([Natural('x', UNKNOWN_PARITY, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
-conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
-prove(hypothesis, conclusion)
-print("---------------------------------")
+	print("Proof 2: given x = 2k for some k, prove x even")
+	hypothesis = Node([Natural('x', UNKNOWN_PARITY, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	conclusion = Node([Natural('x', EVEN, Binop('*', 2, 'k')), Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	prove(hypothesis, conclusion)
+	print("---------------------------------")
 
-print("Proof 3: given x = 2k + 2l for some k and l, prove x = 2(k + l)")
-hypothesis = Node([
-	Natural('x', UNKNOWN_PARITY, Binop('+', Binop('*', 2, 'k'), Binop('*', 2, 'l'))), 
-	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
-	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
-conclusion = Node([
-	Natural('x', UNKNOWN_PARITY, Binop('*', 2, Binop('+', 'k', 'l'))),
-	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
-	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
-prove(hypothesis, conclusion)
-print("---------------------------------")
+	print("Proof 3: given x = 2k + 2l for some k and l, prove x = 2(k + l)")
+	hypothesis = Node([
+		Natural('x', UNKNOWN_PARITY, Binop('+', Binop('*', 2, 'k'), Binop('*', 2, 'l'))), 
+		Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+		Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	conclusion = Node([
+		Natural('x', UNKNOWN_PARITY, Binop('*', 2, Binop('+', 'k', 'l'))),
+		Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+		Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	prove(hypothesis, conclusion)
+	print("---------------------------------")
 
-# print("Proof *: given x = 2k, y = 2l, z = x + y for some k and l, prove z even")
+def non_trivial_proofs():
+	print("NONTRIVIAL PROOFS:")
+	print("Proof 4: given x = 2k + 2l for some k and l, prove x even")
+	hypothesis = Node([
+		Natural('x', UNKNOWN_PARITY, Binop('+', Binop('*', 2, 'k'), Binop('*', 2, 'l'))),
+		Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+		Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	conclusion = Node([
+		Natural('x', EVEN, Binop('*', 2, Binop('+', 'k', 'l'))),
+		Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+		Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	prove(hypothesis, conclusion)
+	print("---------------------------------")
+	# print("Proof 5: given x = 2k, y = 2l, z = x + y for some k and l, prove z even")
+	# hypothesis = Node([
+	# 	Natural('x', UNKNOWN_PARITY, Binop('*', 2, 'k')),
+	# 	Natural('y', UNKNOWN_PARITY, Binop('*', 2, 'l')),
+	# 	Natural('z', UNKNOWN_PARITY, Binop('+', 'x', 'y')),
+	# 	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+	# 	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	# conclusion = Node([
+	# 	Natural('x', UNKNOWN_PARITY, Binop('*', 2, 'k')),
+	# 	Natural('y', UNKNOWN_PARITY, Binop('*', 2, 'l')),
+	# 	Natural('z', EVEN, Binop('+', 'x', 'y')),
+	# 	Natural('k', UNKNOWN_PARITY, UNKNOWN_VALUE),
+	# 	Natural('l', UNKNOWN_PARITY, UNKNOWN_VALUE)], [])
+	# prove(hypothesis, conclusion)
+	# print("---------------------------------")
+
+trivial_proofs()
+non_trivial_proofs()
