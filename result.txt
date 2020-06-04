@@ -1,0 +1,96 @@
+TRIVIAL PROOFS:
+Proof 1: given x even, prove x = 2k for some k
+Step 1
+	x = [EVEN, UNKNOWN_VALUE]
+Step 2
+	x = [EVEN, (* 2 a)]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+
+---------------------------------
+Proof 2: given x = 2k for some k, prove x even
+Step 1
+	x = [UNKNOWN_PARITY, (* 2 k)]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 2
+	x = [EVEN, (* 2 k)]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+
+---------------------------------
+Proof 3: given x = 2k + 2l for some k and l, prove x = 2(k + l)
+Step 1
+	x = [UNKNOWN_PARITY, (+ (* 2 k) (* 2 l))]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 2
+	x = [UNKNOWN_PARITY, (* 2 (+ k l))]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+
+---------------------------------
+Proof 4: given x = 2k for k = 4, prove x = 2 * 4
+Step 1
+	x = [UNKNOWN_PARITY, (* 2 k)]
+	k = [UNKNOWN_PARITY, 4]
+Step 2
+	x = [UNKNOWN_PARITY, (* 2 4)]
+	k = [UNKNOWN_PARITY, 4]
+
+---------------------------------
+NONTRIVIAL PROOFS:
+Proof 5: given x = 2k + 2l for some k and l, prove x even
+Step 1
+	x = [UNKNOWN_PARITY, (+ (* 2 k) (* 2 l))]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 2
+	x = [UNKNOWN_PARITY, (* 2 (+ k l))]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 3
+	x = [EVEN, (* 2 (+ k l))]
+	k = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	l = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+
+---------------------------------
+Proof 5: given x even, y = even, z = x + y, prove z even
+Step 1
+	x = [EVEN, UNKNOWN_VALUE]
+	y = [EVEN, UNKNOWN_VALUE]
+	z = [UNKNOWN_PARITY, (+ x y)]
+Step 2
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, UNKNOWN_VALUE]
+	z = [UNKNOWN_PARITY, (+ x y)]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 3
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, (* 2 b)]
+	z = [UNKNOWN_PARITY, (+ x y)]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	b = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 4
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, (* 2 b)]
+	z = [UNKNOWN_PARITY, (+ (* 2 a) y)]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	b = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 5
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, (* 2 b)]
+	z = [UNKNOWN_PARITY, (+ (* 2 a) (* 2 b))]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	b = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 6
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, (* 2 b)]
+	z = [UNKNOWN_PARITY, (* 2 (+ a b))]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	b = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+Step 7
+	x = [EVEN, (* 2 a)]
+	y = [EVEN, (* 2 b)]
+	z = [EVEN, (* 2 (+ a b))]
+	a = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+	b = [UNKNOWN_PARITY, UNKNOWN_VALUE]
+
+---------------------------------
