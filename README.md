@@ -2,7 +2,7 @@
 
 The idea is to use graphs to do simple proofs.
 
-Currently, it uses a couple axioms about natural numbers and there are two example proofs underneath the code demonstrating functionality. I would like to add more axioms and greater functionality.
+Currently, it uses three axioms about natural numbers and there are four example proofs underneath the code demonstrating functionality. Three of the proofs are trivial and one is nontrivial. 
 
 Run with ./proof.py or python3 proof.py
 
